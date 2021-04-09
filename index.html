@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Click Any Part Of Image To Show Information</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+		<script src="phaser.js"></script>
+		<script src="jquery-3.5.1.min.js"></script>
+		
+		<style>
+			
+			@font-face {
+				font-family: fontRegular;
+				src: url(Graphik-Regular.otf);
+			}
+			
+			@font-face {
+				font-family: fontMedium;
+				src: url(Graphik-Medium.otf);
+			}
+			
+			html,body{
+				width: 100%;
+				height: 100%;
+				font-family: fontMedium;
+			}
+			
+			body{
+				padding: 0px;
+				margin: 0px;
+				background-color: #d8d8d6;
+				overflow: hidden;
+			}
+			
+			#ormessage{
+				display: none; 
+				position: fixed;
+				top: 0;
+				left: 0; 
+				right: 0;
+				bottom: 0;
+				background-color: white;
+				z-index: 10;
+			}
+			
+			#body{
+				display: none;
+				-webkit-box-shadow: 0px 0px 27px 2px rgba(0,0,0,0.45);
+				-moz-box-shadow: 0px 0px 27px 2px rgba(0,0,0,0.45);
+				box-shadow: 0px 0px 27px 2px rgba(0,0,0,0.45);
+			}
+			
+			#textbox{
+				background-color: rgba(255,255,255,.5);
+				backdrop-filter: blur(10px);
+				position: fixed;
+				top: 0; left: 0; right: 0; bottom: 0;
+				padding: 20%;
+				padding-top: 50px;
+				padding-bottom: 50px;
+				display: none;
+				overflow: auto;
+			}
+			
+			#whiteblock{
+				-webkit-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.35);
+				-moz-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.35);
+				box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.35);
+				color: red; float: right; cursor: pointer;
+			}
+			
+			.lds-ripple {
+			  display: inline-block;
+			  position: relative;
+			  width: 80px;
+			  height: 80px;
+			}
+			.lds-ripple div {
+			  position: absolute;
+			  border: 4px solid #fff;
+			  opacity: 1;
+			  border-radius: 50%;
+			  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+			}
+			.lds-ripple div:nth-child(2) {
+			  animation-delay: -0.5s;
+			}
+			@keyframes lds-ripple {
+			  0% {
+				top: 36px;
+				left: 36px;
+				width: 0;
+				height: 0;
+				opacity: 1;
+			  }
+			  100% {
+				top: 0px;
+				left: 0px;
+				width: 72px;
+				height: 72px;
+				opacity: 0;
+			  }
+			}
+			
+			
+			
+
+		</style>
+		
+
+		
+	</head>
+	<body>
+	
+		
+		<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
+			<div id="body" style="width: 100%; height: 100%;"></div>
+		</div>
+		
+
+		
+		<div id="loading" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: black; z-index: 10; display: none;">
+			<div style="display: table; width: 100%; height: 100%;">
+				<div style="display: table-cell; vertical-align: middle; text-align: center; color: gray;">
+					<div id="loadingsign" class="lds-ripple"><div></div><div></div></div>
+					<p id="loadingmessage">Loading...</p>
+				</div>
+			</div>
+		</div>
+		
+		<div id="textbox">
+			<div style="background-color: white; padding: 30px;">
+				<div id="whiteblock" onclick='$("#textbox").fadeOut();'>X</div>
+				<h1 id="tbtitle"></h1>
+				<p id="tben" style="font-family: fontRegular;"></p>
+			</div>
+		</div>
+		
+		
+		<script>
+		
+			function showLoading(txt, notloading){
+				if(notloading == undefined || notloading == false)
+					$("#loadingsign").show();
+				else
+					$("#loadingsign").hide();
+				$("#loadingmessage").html(txt);
+				$("#loading").show();
+				
+			}
+			
+			function hideLoading(){
+				setTimeout(function(){
+					$("#loading").fadeOut();
+				},1000);
+			}
+		
+			var needToReload;
+			
+			
+			$(document).ready(function(){
+				$("#body").fadeIn();
+			});
+			
+			var mbuh;
+			var bg1;
+			
+			var startbutton;
+			
+
+			
+			var baseWidth = 2343;			
+			var baseHeight = 2048;
+			
+			class SceneIntro extends Phaser.Scene {
+			
+				
+
+				constructor ()
+				{
+					super('SceneIntro');
+				}
+
+				preload ()
+				{
+					showLoading("Please wait...");
+					
+					this.load.on('complete', function(){
+						hideLoading();
+					});
+					
+					
+					this.load.image("bg1", "images/background1.jpg");
+					this.load.image("startbutton", "images/button.png");
+					
+					
+				}
+
+				create ()
+				{
+					mbuh = this;
+					
+					bg1 = this.add.sprite(0, 0, "bg1");
+					bg1.setOrigin(0);
+					//bg1.setScale(baseWidth/2343, baseHeight/2048);
+					makeButton(1950, 840, "Deer", "A beatiful animal.");
+				}
+				
+				
+			}
+			
+			
+			config = {
+				type: Phaser.CANVAS,
+				backgroundColor: '#292929',
+				scale: {
+					parent: 'body',
+					mode: Phaser.Scale.FIT,
+					autoCenter: Phaser.Scale.CENTER_BOTH,
+					width: baseWidth,
+					height: baseHeight
+				},
+				scene: [ SceneIntro ],
+				dom: {
+					createContainer: true
+				},
+			};
+
+			game = new Phaser.Game(config);
+			
+			
+			function makeButton(x, y, title, en, id){
+				startbutton = mbuh.add.sprite(x, y, "startbutton").setInteractive({cursor: 'pointer'});
+				startbutton.setOrigin(0.5, 0.5);
+				startbutton.setScale(1);
+				startbutton.alpha = .75;;
+				startbutton.on("pointerdown", function(){
+					showTextBox(title, en, id);
+				});
+				
+				startbutton.on('pointerover', function () {
+					this.setScale(1.2);
+					this.alpha = 1;
+				});
+				
+				startbutton.on('pointerout', function () {
+					this.setScale(1);
+					this.alpha = .75;
+				});
+
+			}
+			
+			function showTextBox(title, en){
+				$("#tbtitle").html(title);
+				$("#tben").html(en);
+				$("#textbox").fadeIn();
+			}
+			
+			
+			
+		</script>
+		
+		
+	</body>
+</html>
